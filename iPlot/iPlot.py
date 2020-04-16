@@ -21,7 +21,7 @@ Example in the python shell,
 ##p.add_option('', '--sub-dir',       default="",          dest='subDir',          help='Directory in root files to plot')
 ##p.add_option('', '--output-dir',    default="plots",     dest='output',          help='Directory to put output .eps')
 ##p.add_option('', '--model',         default="BasicModel",dest='model',           help='Moduling to use a la MakeModeling.py')
-##p.add_option('', '--mcscale',       default=1.0, type=float,dest='mcscale',         help='Set MC Scale')    
+##p.add_option('', '--mcscale',       default=1.0, type=float,dest='mcscale',         help='Set MC Scale')
 ##p.add_option('', '--histName',      default=None,    dest='histName',        help='Histnames')
 ##p.add_option('', '--debug',         default=False, action='store_true', dest='debug',help='activate debugging')
 ###p.add_option('', '--tree',          default=False, action='store_true', dest='doTree',help='use tree')
@@ -39,7 +39,7 @@ import sys, os
 #iStackDir = os.path.dirname(os.path.realpath(__file__))
 #sys.path.insert(0,iStackDir+'/scripts/')
 
-#from iPlotLoadPath import loadPath 
+#from iPlotLoadPath import loadPath
 #loadPath()
 from iUtils import parseOpts
 (options, args) = parseOpts()
@@ -54,7 +54,7 @@ from iUtils import parseOpts
 #    ]
 
 import ROOTHelp.FancyROOTStyle
-                   
+
 
 #for p in atlasstylesearch:
 #    if os.path.exists(p):
@@ -140,7 +140,7 @@ def InitPM(model,baseDir,subDir,histName,output,mcscale=1.0,interactive=True, de
                                  histName1 = histName,
                                  histName2 = args[1],
                                  interactive=interactive)
-        
+
 
     #
     #  Load more complicated model
@@ -201,14 +201,15 @@ def SetXLabels(xlabel, theHists):
 def SetOutput(output):
     pm.output = output
     if not os.path.exists(output):
-        os.mkdir(output)
-    return 
+        # os.mkdir(output)
+        os.makedirs(output)
+    return
 
 
 
 # ----------------------------------------------------------------------------
 def plot(var, region = "",  **kw):
-         
+
     global currentPlot
     global currentLegendLimits
 
@@ -217,13 +218,13 @@ def plot(var, region = "",  **kw):
     #
     #  Read in Options
     #
-    ylabel     = kw.get('ylabel'    ,  None) 
-    xlabel     = kw.get('xlabel'    ,  None) 
+    ylabel     = kw.get('ylabel'    ,  None)
+    xlabel     = kw.get('xlabel'    ,  None)
     isLogy     = kw.get('logy'      ,  False)
     isLogx     = kw.get('logx'      ,  False)
     plotPreFix = kw.get('plotPreFix',  "")
     binning    = kw.get('binning'   ,  None)
-    
+
     plotName  = getPlotName(var,region,isLogy,isLogx)
     plotName += plotPreFix
 
@@ -231,7 +232,7 @@ def plot(var, region = "",  **kw):
     order    = []
 
     if isinstance(var,list) and isinstance(region,list):
-        print "will plot different vars from differnt folders" 
+        print "will plot different vars from differnt folders"
         varName    = var[0]
         matchedRegion = [getRegName(region[0]),getRegName(region[1])]
         regionName = matchedRegion[0]
@@ -263,7 +264,7 @@ def plot(var, region = "",  **kw):
 
 
     elif not isinstance(var,list) and isinstance(region,list):
-        print "will plot vars from ",len(region)," differnt folders" 
+        print "will plot vars from ",len(region)," differnt folders"
         matchedRegion = [getRegName(region[0]),getRegName(region[1])]
         pm.updateDirs(matchedRegion[0])
 
@@ -294,7 +295,7 @@ def plot(var, region = "",  **kw):
         order    = theHists.keys()
         order.sort()
         #print "order is ",
-        
+
         matchedRegion = regionName
 
     #
@@ -325,12 +326,13 @@ def plot(var, region = "",  **kw):
 
 
 
-                                             
+
     pm.updateDirs("")
     if currentPlot:
 
         #currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+".eps")
         currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+".pdf")
+        currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+".png")
 
 
     return currentPlot
@@ -349,16 +351,16 @@ def comp(var, region="",  **kw):
     #
     #  Read in Options
     #
-    ylabel    = kw.get('ylabel'    ,  None) 
-    xlabel    = kw.get('xlabel'    ,  None) 
-    norm      = kw.get('norm'      ,  True) 
-    
+    ylabel    = kw.get('ylabel'    ,  None)
+    xlabel    = kw.get('xlabel'    ,  None)
+    norm      = kw.get('norm'      ,  True)
+
 
     theHists = {}
     order    = []
 
     if isinstance(var,list) and isinstance(region,list):
-        print "will plot different vars from differnt folders" 
+        print "will plot different vars from differnt folders"
         varName    = var[0]
         regionName = region[0]
 
@@ -367,7 +369,7 @@ def comp(var, region="",  **kw):
         pm.updateDirs(region[0])
         order.append(region[0])
         theHists[region[0]] = pm.getHists(var[0], **kw)[pm.order[0]]
-        
+
 
         pm.updateDirs(region[1])
         order.append(region[1]+pm.order[1])
@@ -375,7 +377,7 @@ def comp(var, region="",  **kw):
 
     elif not isinstance(var,list) and isinstance(region,list):
 
-        print "will plot vars from ",len(region)," differnt folders" 
+        print "will plot vars from ",len(region)," differnt folders"
         varName = var
         regionName = region[0]
 
@@ -430,18 +432,19 @@ def comp(var, region="",  **kw):
                               legend_limits = currentLegendLimits,
                               plot_order = order,
                               **kw)
-    
+
     pm.updateDirs("")
     if currentPlot:
         #currentPlot['canvas'].SaveAs(pm.output+"/"+regionName+"_"+varName+".eps")
         currentPlot['canvas'].SaveAs(pm.output+"/"+regionName+"_"+varName+".pdf")
+        currentPlot['canvas'].SaveAs(pm.output+"/"+regionName+"_"+varName+".png")
 
     return currentPlot
 
 
 # ----------------------------------------------------------------------------
 def stack(var, region,  **kw):
-         
+
     global currentPlot
     global currentLegendLimits
 
@@ -450,8 +453,8 @@ def stack(var, region,  **kw):
     #
     #  Read in Options
     #
-    ylabel    = kw.get('ylabel'    ,  None) 
-    xlabel    = kw.get('xlabel'    ,  None) 
+    ylabel    = kw.get('ylabel'    ,  None)
+    xlabel    = kw.get('xlabel'    ,  None)
     #plotName  = kw.get('plotName'  ,  None)
     isLogy    = kw.get('logy'      ,  False)
     isLogx    = kw.get('logx'      ,  False)
@@ -462,7 +465,7 @@ def stack(var, region,  **kw):
     order    = []
 
     if isinstance(var,list) and isinstance(region,list):
-        print "will plot different vars from differnt folders" 
+        print "will plot different vars from differnt folders"
         varName    = var[0]
         regionName = region[0]
 
@@ -475,8 +478,8 @@ def stack(var, region,  **kw):
         pm.updateDirs(region[1])
         order.append(region[1])
         theHists[region[1]] = pm.getHists(var[1], **kw)["Data"]
-    
-        
+
+
     elif isinstance(var,list) and not isinstance(region,list):
         pm.updateDirs(region)
         varName    = var[0]
@@ -494,7 +497,7 @@ def stack(var, region,  **kw):
 
     elif not isinstance(var,list) and isinstance(region,list):
         pm.updateDirs(region[0])
-        print "will plot vars from ",len(region)," differnt folders" 
+        print "will plot vars from ",len(region)," differnt folders"
         varName = var
         regionName = region[0]
         if var.find("*") != -1: return listVars(var.replace("*",""),regionName)
@@ -514,7 +517,7 @@ def stack(var, region,  **kw):
         varName = var
         regionName = region
         if var.find("*") != -1: return listVars(var.replace("*",""),regionName)
-        
+
         theHists = pm.getHists(var, **kw)
         order    = theHists.values()
 
@@ -536,22 +539,23 @@ def stack(var, region,  **kw):
 
 
 
-                                             
+
     pm.updateDirs("")
     if currentPlot:
 
         #currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+".eps")
         currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+".pdf")
+        currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+".png")
 
 #        if not plotName:
 #            currentPlot['canvas'].SaveAs(pm.output+"/"+regionName+"_"+varName+".eps")
 #            currentPlot['canvas'].SaveAs(pm.output+"/"+regionName+"_"+varName+".pdf")
 #        else:
 #
-#            # 
+#            #
 #            #  Need to do this twice to get the plots to come out with extra lines
-#            #   (Crazy I know) 
-#            # 
+#            #   (Crazy I know)
+#            #
 #            currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+"_"+varName+".eps")
 #            currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+"_"+varName+".pdf")
 #            currentPlot['canvas'].SaveAs(pm.output+"/"+plotName+"_"+varName+".eps")
@@ -560,10 +564,11 @@ def stack(var, region,  **kw):
     return currentPlot
 
 
-# ----------------------------------------------------------------------------    
+# ----------------------------------------------------------------------------
 def saveCan():
     #currentPlot['canvas'].SaveAs(pm.output+"/"+currentRegBase+"_"+currentCut+"_"+currentVar+".eps")
     currentPlot['canvas'].SaveAs(pm.output+"/"+currentRegBase+"_"+currentCut+"_"+currentVar+".pdf")
+    currentPlot['canvas'].SaveAs(pm.output+"/"+currentRegBase+"_"+currentCut+"_"+currentVar+".png")
     print "Wrote "+pm.output+"/"+currentRegBase+"_"+currentCut+"_"+currentVar+".pdf"
 
 
@@ -596,7 +601,7 @@ def getRegName(key,quiet=True):
     if not key.find("/") == -1: return key
 
 
-    pm.updateDirs("")    
+    pm.updateDirs("")
 
     subdir=pm.modeling[pm.order[0]].dir
     theTDirs=pm.getListOf(TDirectory, subdir)
@@ -620,9 +625,9 @@ def getRegName(key,quiet=True):
         return matches[0]
 
     if len(matches) < 1:
-        print 
+        print
         print "ERROR No Directory Matching ",key
-        print 
+        print
 
     if len(matches) > 1:
         print "More than one dir match ",len(matches)
@@ -636,12 +641,12 @@ def getRegName(key,quiet=True):
                 smallest = m
         print "Matched dir:",smallest
         return smallest
-            
+
 
 # ----------------------------------------------------------------------------
 def listVars(key="",region=None,subdir=None, quiet=False):
     pm.updateDirs(region)
-        
+
     if not subdir:
         subdir=pm.modeling[pm.order[0]].dir
 
@@ -654,7 +659,7 @@ def listVars(key="",region=None,subdir=None, quiet=False):
     #for h in theHists:
     #    if h.find(key)!=-1:
     #        vars.append(h)
-            
+
     theHists=pm.getListOf(TH1,subdir)
     for h in theHists:
         if h.find(key)!=-1:
@@ -670,7 +675,7 @@ def listVars(key="",region=None,subdir=None, quiet=False):
     if region is None:
 
         for d in theTDirs:
-            print 
+            print
             print d
             print "--------------"
             listVars(region=d, key=key, quiet=quiet)

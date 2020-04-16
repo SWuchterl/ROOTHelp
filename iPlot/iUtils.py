@@ -1,7 +1,7 @@
 import os
 
 #
-# The following is to get the history 
+# The following is to get the history
 #
 global historyPath
 global output
@@ -17,12 +17,12 @@ def parseOpts():
     p.add_option('', '--sub-dir',       default="",          dest='subDir',          help='Directory in root files to plot')
     p.add_option('--output',   type = 'string', default = "plots",          dest = 'output',     help = 'output dir' )
     p.add_option('--histName', type = 'string', default = None,          dest = 'histName',   help = 'candName' )
-    p.add_option('', '--mcscale',       default=1.0, type=float,dest='mcscale',         help='Set MC Scale')    
+    p.add_option('', '--mcscale',       default=1.0, type=float,dest='mcscale',         help='Set MC Scale')
     p.add_option('--model'   , type = 'string', default = "BasicModel",  dest = 'model',      help = 'candName' )
     p.add_option('--labName', type = 'string', default = None,          dest = 'labName',   help = 'label Name' )
     p.add_option('', '--debug',         default=False, action='store_true', dest='debug',help='activate debugging')
     p.add_option('--norm', action="store_true",help = 'label Name' )
-    p.add_option('', '--tree',          default=False, action='store_true', dest='doTree',help='use tree')    
+    p.add_option('', '--tree',          default=False, action='store_true', dest='doTree',help='use tree')
     (o,a) = p.parse_args()
 
     if not o.histName:
@@ -42,47 +42,47 @@ def initHistory():
         print "Module readline not available."
     else:
 
-        import rlcompleter        
-        
+        import rlcompleter
+
         if os.path.exists(historyPath):
             #pass
             print "historyPath is ("+historyPath+")"
             readline.read_history_file(historyPath)
-        
+
         class IrlCompleter(rlcompleter.Completer):
             """
             This class enables a "tab" insertion if there's no text for
             completion.
-        
+
             The default "tab" is four spaces. You can initialize with '\t' as
             the tab if you wish to use a genuine tab.
-        
+
             """
-        
+
             def __init__(self, tab='    '):
                 self.tab = tab
                 rlcompleter.Completer.__init__(self)
-        
-        
+
+
             def complete(self, text, state):
                 if text == '':
                     readline.insert_text(self.tab)
                     return None
                 else:
                     return rlcompleter.Completer.complete(self,text,state)
-        
-        
+
+
         #you could change this line to bind another key instead tab.
         #readline.parse_and_bind("tab: complete")
         import sys
         thisSys = sys.platform
         onMac = (not thisSys.find('darwin') == -1)
         if onMac:
-            readline.parse_and_bind ("bind ^I rl_complete") 
-        
+            readline.parse_and_bind ("bind ^I rl_complete")
+
         #readline.parse_and_bind('tab: complete')
         readline.set_completer(IrlCompleter('\t').complete)
-    
+
 
     return historyPath
 
@@ -112,7 +112,7 @@ def getPlotName(var,region,isLogY=False,isLogX=False):
         retName = region[0]+"_vs_"+region[1]+"_"+var
     else:
         retName = region+"_"+var
-    
+
 
     if isLogY:
         retName += "_logY"
@@ -163,7 +163,7 @@ def getPM(o):
 
 #
 # SetBatch
-# 
+#
 def setBatch():
     from ROOT  import gROOT
     gROOT.SetBatch(True)
@@ -171,7 +171,7 @@ def setBatch():
 
 #
 #  Call plotting and save hist (HAve to do it this way to get the reations right)
-# 
+#
 from iPlot import plot as iplot_plot
 def plot(var,reg,**kw):
     from iUtils import parseOpts
@@ -179,12 +179,13 @@ def plot(var,reg,**kw):
     (o,a) = parseOpts()
     plotName  = getPlotName(var,reg)
     #cp['canvas'].SaveAs(o.output+"/"+plotName+".eps")
+    cp['canvas'].SaveAs(o.output+"/"+plotName+".png")
     cp['canvas'].SaveAs(o.output+"/"+plotName+".pdf")
     return cp
 
 #
 #  Call plotting and save hist (HAve to do it this way to get the reations right)
-# 
+#
 from iPlot import comp as iplot_comp
 def comp(var,reg="",**kw):
     cp = iplot_comp(var,reg,**kw)
@@ -203,13 +204,14 @@ def comp(var,reg="",**kw):
     print "regName is",regName
     print cp
     #cp['canvas'].SaveAs(o.output+"/"+regName+"_"+varName+".eps")
+    cp['canvas'].SaveAs(o.output+"/"+regName+"_"+varName+".png")
     cp['canvas'].SaveAs(o.output+"/"+regName+"_"+varName+".pdf")
 
 
 
 #
 #  Call plotting and save hist (HAve to do it this way to get the reations right)
-# 
+#
 from iPlot import stack as iplot_stack
 def stack(var,reg,**kw):
     cp = iplot_stack(var,reg,**kw)
@@ -219,6 +221,7 @@ def stack(var,reg,**kw):
 
     (o,a) = parseOpts()
     #cp['canvas'].SaveAs(o.output+"/"+regName+"_"+varName+".eps")
+    cp['canvas'].SaveAs(o.output+"/"+regName+"_"+varName+".png")
     cp['canvas'].SaveAs(o.output+"/"+regName+"_"+varName+".pdf")
-    
+
     return cp
