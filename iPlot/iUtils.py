@@ -22,6 +22,7 @@ def parseOpts():
     p.add_option('--labName', type = 'string', default = None,          dest = 'labName',   help = 'label Name' )
     p.add_option('', '--debug',         default=False, action='store_true', dest='debug',help='activate debugging')
     p.add_option('--norm', action="store_true",help = 'label Name' )
+    p.add_option('--puppi', action="store_true",help = 'read in puppi jets, not pf' )
     p.add_option('', '--tree',          default=False, action='store_true', dest='doTree',help='use tree')
     (o,a) = p.parse_args()
 
