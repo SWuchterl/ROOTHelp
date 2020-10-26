@@ -23,13 +23,13 @@ def plot_hist_list(hists, **kw):
         if not draw_options:
             if debug: print "\t\t Setting draw_options to ''"
             draw_options = ""
-            
+
         if x_min or x_max:
             setXMinMax(h, x_min, x_max)
-            
+
         if i:
             if debug: print "\t\t Dawing ",draw_options[i]+"same"
-            h.Draw(draw_options[i]+"same")    
+            h.Draw(draw_options[i]+"same")
         else:
             #h.Draw(draw_options)
             if not y_title == ROOTHelp.default:
@@ -79,7 +79,7 @@ def config_hists(hists, **kw):
     #  Congigure the plots
     #
     for i, h in enumerate(hists):
-        opt = dict() 
+        opt = dict()
         opt['line_color']   = line_colors[i]
         opt['marker_color'] = line_colors[i]
         opt['line_style']   = styles[i]
@@ -111,11 +111,11 @@ def config_hists(hists, **kw):
 
 
     return {'hists':hists}
-    
+
 
 
 #
-# Plot histsogram on top of each other 
+# Plot histsogram on top of each other
 #
 def plot_hists( hists, name, **kw):
     """
@@ -182,7 +182,7 @@ def plot_shared_axis(top_hists, bottom_hists,name='',split=0.5
     top_pad.SetFillStyle(0) # transparent
     top_pad.SetBorderSize(0)
     plot_hist_list(top_hists, **kw)
-    
+
     bottom_pad.cd()
     bottom_pad.SetTopMargin(2*axissep)
     bottom_pad.SetBottomMargin(canvas.GetBottomMargin()*1.0/split)
@@ -197,7 +197,7 @@ def plot_shared_axis(top_hists, bottom_hists,name='',split=0.5
     ratio_axis.GetYaxis().SetRangeUser(rMin, rMax)
     bottom_hists.GetYaxis().SetRangeUser(rMin, rMax)
     bottom_hists.GetYaxis().SetTitle(rLabel)
-    
+
 
     if bayesRatio:
         ratio_axis.Draw("axis")
@@ -210,7 +210,8 @@ def plot_shared_axis(top_hists, bottom_hists,name='',split=0.5
         oldSize = bottom_hists.GetMarkerSize()
         bottom_hists.SetMarkerSize(0)
         bottom_hists.DrawCopy("same e0")
-        bottom_hists.SetMarkerSize(oldSize)
+        # bottom_hists.SetMarkerSize(oldSize)
+        bottom_hists.SetMarkerSize(0.5)
         bottom_hists.Draw("PE same")
 
     line = ROOT.TLine()
@@ -222,41 +223,41 @@ def plot_shared_axis(top_hists, bottom_hists,name='',split=0.5
 
         factor = factors[i_pad]
         ndiv   = ndivs[i_pad]
-        
+
         prims = [ p.GetName() for p in pad.GetListOfPrimitives() ]
-        
+
         #
         #  Protection for scaling hists multiple times
         #
         procedHist = []
-        
+
         for name in prims:
-            
+
             if name in procedHist: continue
             procedHist.append(name)
-        
+
             h = pad.GetPrimitive(name)
             if isinstance(h, ROOT.TH1) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                 if isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                     h = h.GetHistogram()
                 #print "factor is",factor,h.GetName(),split
-        
+
                 if i_pad == 1:
                     h.SetLabelSize(h.GetLabelSize('Y')*factor, 'Y')
                     h.SetTitleSize(h.GetTitleSize('X')*factor, 'X')
                     h.SetTitleSize(h.GetTitleSize('Y')*factor, 'Y')
                     h.SetTitleOffset(h.GetTitleOffset('Y')/factor, 'Y')
-                    
+
                 if i_pad == 1:
                     h.GetYaxis().SetNdivisions(ndiv)
-                h.GetXaxis().SetNdivisions()                
+                h.GetXaxis().SetNdivisions()
                 if i_pad == 0:
                     h.SetLabelSize(0.0, 'X')
                     h.GetXaxis().SetTitle("")
                 else:
                     h.SetLabelSize(h.GetLabelSize('X')*factor, 'X')
                     ## Trying to remove overlapping y-axis labels.  Doesn't work.
-                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax()) 
+                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax())
                     # h.GetYaxis().SetBinLabel( h.GetYaxis().GetLast(), '')
 
     return {'canvas':canvas,'ratio_axis':ratio_axis,"top_pad":top_pad,"bottom_pad":bottom_pad}
@@ -270,7 +271,7 @@ def moveDataPointsToBarycenter(ratio,histForXBarycenterCalc, debug=False):
         ratio.GetPoint(p,xValue,theEff)
         errHigh = ratio.GetErrorXhigh(p)
         errLow = ratio.GetErrorXlow(p)
-        
+
         xMin = xValue - errLow
         xMax = xValue + errHigh
 
@@ -279,7 +280,7 @@ def moveDataPointsToBarycenter(ratio,histForXBarycenterCalc, debug=False):
         x_weights = []
         sumWeights = 0
 
-        for iBinOrig in range(histForXBarycenterCalc.GetNbinsX()):        
+        for iBinOrig in range(histForXBarycenterCalc.GetNbinsX()):
             thisBinCenter = histForXBarycenterCalc.GetBinCenter(iBinOrig)
             thisNEvents   = float(histForXBarycenterCalc.GetBinContent(iBinOrig))
             if thisBinCenter > xMin and thisBinCenter < xMax:
@@ -287,7 +288,7 @@ def moveDataPointsToBarycenter(ratio,histForXBarycenterCalc, debug=False):
                 x_values.append(thisBinCenter)
                 x_weights.append(thisNEvents)
                 sumWeights += thisNEvents
-            
+
 
         #
         # Calculate weighted average
@@ -305,9 +306,9 @@ def moveDataPointsToBarycenter(ratio,histForXBarycenterCalc, debug=False):
 
         xErrLow = errLow+xShift
         xErrHigh = errHigh-xShift
-            
-        if debug: 
-            print "OLD",xMin,"-",xMax            
+
+        if debug:
+            print "OLD",xMin,"-",xMax
             print "NEW",x_barycenter-xErrLow,"-",x_barycenter+xErrHigh
         ratio.SetPointError(p,xErrLow,xErrHigh,ratio.GetErrorYlow(p),ratio.GetErrorYhigh(p))
 
@@ -380,10 +381,10 @@ def makeBayesLikeRatio(num, den, histForXBarycenterCalc=None):
 def makeRatio(num, den, histForXBarycenterCalc=None):
     num.Sumw2()
     den.Sumw2()
-    
+
     ratio = num.Clone(num.GetName()+"_ratio")
     ratio.Divide(den)
-        
+
     debugRatioErrors = False
     if debugRatioErrors:
         xAxis = hists[0].GetXaxis()
@@ -403,8 +404,8 @@ def makeRatio(num, den, histForXBarycenterCalc=None):
         moveDataPointsToBarycenter(ratio,histForXBarycenterCalc)
 
 
-            
-        
+
+
 
 
     return ratio
@@ -426,7 +427,7 @@ def makeStatRatio(num, den, **kw):
     nBins = xAxis.GetNbins()
     var_band   = ROOT.TGraphAsymmErrors(nBins)
     var_band.SetFillColor(ROOT.kRed)
-    
+
     for i in range(nBins):
 
         #
@@ -455,7 +456,7 @@ def makeStatRatio(num, den, **kw):
         var_band.SetPointError(i,
                                xAxis.GetBinCenter(i+1)-xAxis.GetBinLowEdge(i+1),xAxis.GetBinUpEdge(i+1)-xAxis.GetBinCenter(i+1),
                                relError,relError)
-    
+
     return ratio, var_band
 
 #
@@ -468,7 +469,7 @@ def makeDenErrorBand(den, **kw):
     nBins = xAxis.GetNbins()
     var_band   = ROOT.TGraphAsymmErrors(nBins)
     var_band.SetFillColor(ROOT.kRed)
-    
+
     for i in range(nBins):
 
         var_band.SetPoint(i,xAxis.GetBinCenter(i+1),1.0)
@@ -483,12 +484,12 @@ def makeDenErrorBand(den, **kw):
         var_band.SetPointError(i,
                                xAxis.GetBinCenter(i+1)-xAxis.GetBinLowEdge(i+1),xAxis.GetBinUpEdge(i+1)-xAxis.GetBinCenter(i+1),
                                relError,relError)
-    
+
     return var_band
 
 
 #
-# Plot histsogram on top of each other 
+# Plot histsogram on top of each other
 #
 def plot_hists_wratio( hists, name, **kw):
     """
@@ -517,15 +518,15 @@ def plot_hists_wratio( hists, name, **kw):
     #den  = plot['hists'][1]
     #den.Sumw2()
 
-    if bayesRatio:  
+    if bayesRatio:
         plot["ratio"] = makeBayesRatio(num = plot['hists'][0].Clone(), den = plot['hists'][1].Clone())
-    elif showDenError: 
+    elif showDenError:
         plot["ratio"] = makeRatio(num = plot['hists'][0].Clone(),  den = plot['hists'][1].Clone())
-        var_band = makeDenErrorBand(den = plot['hists'][1].Clone(), **kw) 
+        var_band = makeDenErrorBand(den = plot['hists'][1].Clone(), **kw)
         kw["sys_band"] = var_band
-        plot["sys_band"] = var_band        
-    elif statRatio: 
-        ratio, var_band = makeStatRatio(num = plot['hists'][0].Clone(), den = plot['hists'][1].Clone(), **kw) 
+        plot["sys_band"] = var_band
+    elif statRatio:
+        ratio, var_band = makeStatRatio(num = plot['hists'][0].Clone(), den = plot['hists'][1].Clone(), **kw)
         plot['ratio']  = ratio
         kw["sys_band"] = var_band
         plot["sys_band"] = var_band
@@ -544,7 +545,7 @@ def plot_hists_wratio( hists, name, **kw):
     plot['top_pad']=shared['top_pad']
     plot['bottom_pad']=shared['bottom_pad']
     plot['ratio_axis'] = shared['ratio_axis']
-    
+
     return plot
 
 
@@ -597,7 +598,7 @@ def stack_with_data(data, mc, name, **kw):
     stacksum.Reset()
     for h in mc:
         stacksum.Add(h)
-    
+
     # make stack plot
     stack = plot['stack']
 
@@ -618,16 +619,16 @@ def stack_with_data(data, mc, name, **kw):
     # data.GetXaxis().SetTitle("")
     # data.GetYaxis().SetTitle("")
     data.Draw('PE same')
-    
-    plot['canvas'].Update()    
+
+    plot['canvas'].Update()
     plot['data'] = data
     plot['sum'] = stacksum
     return plot
 
 
-# 
+#
 #   Make a stack plot with a ratio below
-# 
+#
 def stack_with_data_and_ratio(data, mc, name,**kw):
     canvas_options= kw.get('canvas_options', ROOTHelp.default)
 
@@ -668,7 +669,7 @@ def stack_with_data_and_ratio(data, mc, name,**kw):
 
     if x_min or x_max:
         setXMinMax(ratio,x_min,x_max)
-        
+
     ratio.Draw("PE")
     line=ROOT.TLine()
     a=ratio.GetXaxis()
@@ -677,14 +678,14 @@ def stack_with_data_and_ratio(data, mc, name,**kw):
         line.DrawLine(x_min,1.0,x_max,1.0)
     else:
         line.DrawLine(a.GetXmin(),1.0,a.GetXmax(),1.0)
- 
+
     shared = plot_shared_axis(stack['canvas'],ratio_canvas,name+"_with_ratio",split=0.3,axissep=0.04,ndivs=[505,503])
     #stack['top_canvas']=stack['canvas']
     #stack['bottom_canvas']=ratio_canvas
     stack['top_pad']=shared['top_pad']
     stack['bottom_pad']=shared['bottom_pad']
     stack['canvas']=shared['canvas']
-    
+
     return stack
 
 
@@ -727,7 +728,7 @@ def stack_no_data(mc, name, **kw):
     stacksum.Reset()
     for h in mc:
         stacksum.Add(h)
-    
+
     # make stack plot
     stack = plot['stack']
 
@@ -742,13 +743,13 @@ def stack_no_data(mc, name, **kw):
     set_min([stack, stacksum], ymin, log_y=canvas_options.log_y)
     set_max([stack, stacksum], ymax, log_y=canvas_options.log_y)
 
-    plot['canvas'].Update()    
+    plot['canvas'].Update()
     plot['sum'] = stacksum
     return plot
 
 
 #
-# Plot histsogram on top of each other 
+# Plot histsogram on top of each other
 #
 def plot_hists_wratio_errorband( hists, histErros, name, **kw):
     """
@@ -786,11 +787,11 @@ def plot_hists_wratio_errorband( hists, histErros, name, **kw):
     var_band.SetFillColor(ROOT.kRed)
     for i in range(nBins):
         var_band.SetPoint(i,xAxis.GetBinCenter(i+1),1.0)
-        
+
         up   = varUp  [i]
         down = varDown[i]
         nom  = hists[1].GetBinContent(i+1)
-        
+
         if nom:
             errUp   = float(up)/nom
             errDown = float(down)/nom
@@ -808,7 +809,7 @@ def plot_hists_wratio_errorband( hists, histErros, name, **kw):
     #
     kw["sys_band"] = var_band
     res = plot_hists_wratio(hists, name, **kw)
-    
+
     return res
 
 

@@ -18,7 +18,7 @@ void SetFancyStyle ()
   gROOT->ForceStyle();
 }
 
-TStyle* FancyStyle() 
+TStyle* FancyStyle()
 {
   TStyle *fancyStyle = new TStyle("FANCY","Fancy style");
 
@@ -59,7 +59,7 @@ TStyle* FancyStyle()
   fancyStyle->SetTitleFont(font,"y");
   fancyStyle->SetLabelFont(font,"z");
   fancyStyle->SetTitleFont(font,"z");
-  
+
   fancyStyle->SetLabelSize(tsize,"x");
   fancyStyle->SetTitleSize(tsize,"x");
   fancyStyle->SetLabelSize(tsize,"y");
@@ -69,11 +69,12 @@ TStyle* FancyStyle()
 
   // use bold lines and markers
   fancyStyle->SetMarkerStyle(20);
-  fancyStyle->SetMarkerSize(1.2);
+  // fancyStyle->SetMarkerSize(1.2);
+  fancyStyle->SetMarkerSize(0.5);
   fancyStyle->SetHistLineWidth(2.);
   fancyStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
 
-  // get rid of X error bars 
+  // get rid of X error bars
   fancyStyle->SetErrorX(0.5);
   // get rid of error bar caps
   //fancyStyle->SetEndErrorSize(0.);
@@ -92,4 +93,3 @@ TStyle* FancyStyle()
   return fancyStyle;
 
 }
-
