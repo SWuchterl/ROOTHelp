@@ -71,7 +71,8 @@ TStyle* FancyStyle()
   fancyStyle->SetMarkerStyle(20);
   // fancyStyle->SetMarkerSize(1.2);
   fancyStyle->SetMarkerSize(0.5);
-  fancyStyle->SetHistLineWidth(2.);
+  // fancyStyle->SetHistLineWidth(2.);
+  fancyStyle->SetHistLineWidth(1.);
   fancyStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
 
   // get rid of X error bars
